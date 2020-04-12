@@ -1,67 +1,69 @@
 package main
+
 import (
-    "fmt"
-    "strings"
-    "os"
-    "image"
-    "github.com/nfnt/resize"
-    _ "image/jpeg"
-    _ "image/png"
+	"fmt"
+	"image"
+	_ "image/jpeg" // decode jpeg image
+	_ "image/png"
+	"os"
+	"strings"
+
+	"github.com/nfnt/resize"
 )
 
-func rgbToGrayScale(R,G,B uint32) uint32 {
-    gray_val := (19595*R + 38470*G + 7471*B + 1<<15) >> 24
-    return gray_val
+func rgbToGrayScale(R, G, B uint32) uint32 {
+	grayVal := (19595*R + 38470*G + 7471*B + 1<<15) >> 24
+	return grayVal
 }
 
 func main() {
-    if len(os.Args) == 1 {
-        fmt.Println("Usage: magrrite [FILE]\n\nConvert picture into an ASCII art\n\nExample:\nmagrrite /home/prdpx7/Pictures/birthday.jpg")
-        return
-    }
-    filename := os.Args[1]
-    f, err := os.Open(filename)
-    if err != nil {
-        fmt.Println("Invalid image file path")
-        return
-    }
-    defer f.Close()
+	if len(os.Args) == 1 {
+		fmt.Println("Usage: magrrite [FILE]\n\nConvert picture into an ASCII art\n\nExample:\nmagrrite /home/prdpx7/Pictures/birthday.jpg")
+		return
+	}
+	filename := os.Args[1]
+	f, err := os.Open(filename)
+	if err != nil {
+		fmt.Println("Invalid image file path")
+		return
+	}
+	defer f.Close()
 
-    ASCII_MAP := [...]string {".", ",", ":", ";", "+", "*", "?", "%", "S", "#", "@"}
-    // offset = 256/len(ASCII_MAP)
-    pixel_offset := uint32(25)
-    img_width := 60
+	ASCIIMap := [...]string{".", ",", ":", ";", "+", "*", "?", "%", "S", "#", "@"}
+	// offset = 256/len(ASCII_MAP)
+	pixelOffset := uint32(25)
+	imgWidth := 70
 
-    img,_,err := image.Decode(f)
-    if err != nil {
-        fmt.Println("Unable to decode image")
-        return
-    }
+	img, _, err := image.Decode(f)
+	if err != nil {
+		fmt.Println("Unable to decode image")
+		return
+	}
 
-    resized_img := resize.Resize(uint(img_width), 0, img, resize.Lanczos3)
-    
-    pixel_arr := []string{}
+	resizedImg := resize.Resize(uint(imgWidth), 0, img, resize.Lanczos3)
 
-    for y := resized_img.Bounds().Min.Y; y < resized_img.Bounds().Max.Y; y++ {
-        // first iteration:  01 02 03 04 05 06
-        // second iteration: 11 12 13 14 15 16
-        // ....
-        for x := resized_img.Bounds().Min.X; x < resized_img.Bounds().Max.X; x ++ {
-            
-            R,G,B,_ := resized_img.At(x,y).RGBA()
+	pixelArray := []string{}
 
-            gray_val := rgbToGrayScale(R,G,B)
-            // get respective ascii char for given y,x based on grayscale value
-            // higher the value, higher the dense ascii char in ASCII_MAP
-            pixel_char := ASCII_MAP[(gray_val/pixel_offset)]
-            pixel_arr = append(pixel_arr, pixel_char)
-        }
-    }
+	for y := resizedImg.Bounds().Min.Y; y < resizedImg.Bounds().Max.Y; y++ {
+		// first iteration:  01 02 03 04 05 06
+		// second iteration: 11 12 13 14 15 16
+		// ....
+		for x := resizedImg.Bounds().Min.X; x < resizedImg.Bounds().Max.X; x++ {
 
-    pixel_length := len(pixel_arr)
-    for i := 0; i < pixel_length; i += img_width {
-        // print each row of pixel matrix
-        fmt.Println(strings.Join(pixel_arr[i:i+img_width], ""))
-    }
-    
+			R, G, B, _ := resizedImg.At(x, y).RGBA()
+
+			grayVal := rgbToGrayScale(R, G, B)
+			// get respective ascii char for given y,x based on grayscale value
+			// higher the value, higher the dense ascii char in ASCIIMap
+			pixelChar := ASCIIMap[(grayVal / pixelOffset)]
+			pixelArray = append(pixelArray, pixelChar)
+		}
+	}
+
+	pixelLength := len(pixelArray)
+	for i := 0; i < pixelLength; i += imgWidth {
+		// print each row of pixel matrix
+		fmt.Println("\t\t\t", strings.Join(pixelArray[i:i+imgWidth], ""))
+	}
+
 }
