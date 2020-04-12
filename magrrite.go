@@ -6,6 +6,7 @@ import (
     "image"
     "github.com/nfnt/resize"
     _ "image/jpeg"
+    _ "image/png"
 )
 
 func rgbToGrayScale(R,G,B uint32) uint32 {
@@ -29,7 +30,7 @@ func main() {
     ASCII_MAP := [...]string {".", ",", ":", ";", "+", "*", "?", "%", "S", "#", "@"}
     // offset = 256/len(ASCII_MAP)
     pixel_offset := uint32(25)
-    img_width := 80
+    img_width := 60
 
     img,_,err := image.Decode(f)
     if err != nil {
