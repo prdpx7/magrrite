@@ -5,6 +5,7 @@ import (
 	"image"
 	_ "image/jpeg" // decode jpeg image
 	_ "image/png"
+	"math"
 	"os"
 	"strings"
 
@@ -31,7 +32,7 @@ func main() {
 
 	ASCIIMap := [...]string{".", ",", ":", ";", "+", "*", "?", "%", "S", "#", "@"}
 	// offset = 256/len(ASCII_MAP)
-	pixelOffset := uint32(25)
+	pixelOffset := uint32(math.Ceil(float64(256)/float64(len(ASCIIMap))))
 	imgWidth := 70
 
 	img, _, err := image.Decode(f)
@@ -44,10 +45,9 @@ func main() {
 
 	pixelArray := []string{}
 
+	// ASCII image conversion
+	//https://stackoverflow.com/a/395116
 	for y := resizedImg.Bounds().Min.Y; y < resizedImg.Bounds().Max.Y; y++ {
-		// first iteration:  01 02 03 04 05 06
-		// second iteration: 11 12 13 14 15 16
-		// ....
 		for x := resizedImg.Bounds().Min.X; x < resizedImg.Bounds().Max.X; x++ {
 
 			R, G, B, _ := resizedImg.At(x, y).RGBA()
