@@ -24,7 +24,7 @@ Example:
 magrrite /home/prdpx7/Pictures/birthday.jpg
 
 ```
-<img src="https://i.imgur.com/E1r5nV4.png" width="900"/>
+<img src="https://i.imgur.com/eMj6DkX.gif" width="900"/>
 
 
 ## But why the name `magrrite` ?
